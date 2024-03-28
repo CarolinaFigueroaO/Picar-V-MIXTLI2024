@@ -11,3 +11,7 @@ fw.turn(90)
 
 bw.speed = 0
 bw.backward()
+
+while True:
+    pass
+
