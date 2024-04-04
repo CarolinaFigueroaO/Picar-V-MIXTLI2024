@@ -16,3 +16,4 @@ bw.backward()
 
 fw.turn(45)
 
+bw.speed = 0
