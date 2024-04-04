@@ -10,8 +10,9 @@ fw = front_wheels.Front_Wheels()
 fw.offset = 10
 
 
-bw.speed = 20
+bw.speed = 0
 bw.backward()
+bw.speed = 50
 
 count = 0
 
