@@ -8,12 +8,18 @@ bw = back_wheels.Back_Wheels()
 fw = front_wheels.Front_Wheels()
 
 fw.offset = 10
-fw.turn(90)
 
 
-bw.speed = 50
+bw.speed = 20
 bw.backward()
 
-fw.turn(45)
+count = 0
 
-bw.speed = 0
+while count < 100:
+    count += 0.5
+    if count > 50 and count < 60:
+        fw.turn(40)
+    
+
+bw.stop()
+print("done")
