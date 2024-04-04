@@ -16,7 +16,7 @@ bw.backward()
 count = 0
 
 while count < 100:
-    count += 0.5
+    count += 0.1
     print(count)
     if count > 50 and count < 60:
         fw.turn(40)
