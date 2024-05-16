@@ -18,7 +18,7 @@ count = 0
 
 while count < 100:
     count += 0.005
-    
+
     
 
 bw.stop()
