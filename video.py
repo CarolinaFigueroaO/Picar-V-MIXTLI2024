@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("/dev/bus/usb/001/006")
 
 def main():
     while True:
