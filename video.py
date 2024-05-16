@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-cap = cv2.VideoCapture("/dev/bus/usb/001/006")
+cap = cv2.VideoCapture(0)
 
 def main():
     while True:
@@ -10,3 +10,7 @@ def main():
         cv2.imshow("frame", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+
+if __name__ == "__main__":
+    main()
