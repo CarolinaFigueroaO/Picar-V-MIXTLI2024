@@ -74,9 +74,9 @@ def analyzeFrame(frame):
             left_boundary = width / 3
             right_boundary = 2 * width / 3
             
-            if avg_cx < left_boundary:
+            if avg_cx < left_boundary+80:
                 print("Girar a la izquierda")
-            elif avg_cx > right_boundary:
+            elif avg_cx > right_boundary-80:
                 print("Girar a la derecha")
             else:
                 print("Adelante")
