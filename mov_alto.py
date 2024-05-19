@@ -150,6 +150,8 @@ def main():
         k = cv2.waitKey(30) 
         if k == 27: #Define the key to close the window
             break  
+    cap.release()
+    cv2.destroyAllWindows()
         
 
 if __name__ == "__main__":
