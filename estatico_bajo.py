@@ -1,6 +1,33 @@
 import cv2
 import numpy as np
 
+
+threshold1 = 240
+threshold2 = 255
+alphaPos = 100
+betaPos = 68
+
+
+def empty(a): # Funcion para los trackbars
+    pass
+
+
+def createTrackbars():
+    cv2.namedWindow("Parameters") # Create a window for the trackbars
+    cv2.resizeWindow("Parameters",640,240) 
+    cv2.createTrackbar("Alpha", "Parameters", 0, 300, empty)
+    cv2.createTrackbar("Beta", "Parameters", 0, 100, empty)
+    cv2.setTrackbarPos("Alpha", "Parameters", alphaPos)
+    cv2.setTrackbarPos("Beta", "Parameters", betaPos)
+
+
+def brightnessAjustment(img):
+    alpha = cv2.getTrackbarPos("Alpha", "Parameters") / 100
+    beta = cv2.getTrackbarPos("Beta", "Parameters")
+    imgBrightness = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
+    return imgBrightness    
+
+
 def getLines(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 200])
@@ -63,12 +90,12 @@ def analyzeFrame(frame):
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
-    
+    createTrackbars()
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-        
+        frame = brightnessAjustment(frame)
         mask = analyzeFrame(frame)
         
         # Muestra el frame y la máscara para depuración
