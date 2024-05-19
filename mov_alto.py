@@ -136,7 +136,7 @@ def angleAdjustment(lines, frame):
 
 def main():
 
-    bw.speed = 50
+    bw.speed = 20
     createTrackbars()
     while True:
         _, frame = cap.read()
