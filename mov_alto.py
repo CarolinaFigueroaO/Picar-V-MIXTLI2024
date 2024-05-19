@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
 import time
+from picar import back_wheels, front_wheels
 import picar
+
 
 cap = cv2.VideoCapture(0)
 
