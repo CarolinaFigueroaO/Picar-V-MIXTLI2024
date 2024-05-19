@@ -78,16 +78,16 @@ def analyzeFrame(frame):
             if avg_cx < left_boundary+80:
                 print("Girar a la izquierda")
                 fw.turn(180)
-                bw.speed = 40
+                bw.speed = 30
 
             elif avg_cx > right_boundary-80:
                 print("Girar a la derecha")
                 fw.turn(0)
-                bw.speed = 40
+                bw.speed = 30
             else:
                 print("Adelante")
                 fw.turn(90)
-                bw.speed = 60
+                bw.speed = 40
 
         else:
             print("No se detecta área negra")
@@ -98,7 +98,7 @@ def analyzeFrame(frame):
 
 
 def main():
-    bw.speed = 60
+    bw.speed = 40
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
