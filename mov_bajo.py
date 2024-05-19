@@ -95,6 +95,7 @@ def analyzeFrame(frame):
 
 
 def main():
+    bw.speed = 40
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
