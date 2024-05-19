@@ -87,6 +87,14 @@ def analyzeFrame(frame):
 
     return mask
 
+
+def angleAdjustment(frame):
+    lines = getLines(frame)
+    contours = getContours(lines, frame)
+    getCenterX(lines)
+    return contours
+
+
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
