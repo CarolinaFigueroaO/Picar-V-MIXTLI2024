@@ -152,6 +152,8 @@ def main():
             break  
     cap.release()
     cv2.destroyAllWindows()
+    bw.speed = 0
+    bw.stop()
         
 
 if __name__ == "__main__":
@@ -160,4 +162,3 @@ if __name__ == "__main__":
     fw = front_wheels.Front_Wheels()
     main()
 
-print("done")
