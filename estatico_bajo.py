@@ -4,8 +4,8 @@ import numpy as np
 
 threshold1 = 240
 threshold2 = 255
-alphaPos = 100
-betaPos = 68
+alphaPos = 30
+betaPos = 48
 
 
 def empty(a): # Funcion para los trackbars
