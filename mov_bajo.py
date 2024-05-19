@@ -78,13 +78,16 @@ def analyzeFrame(frame):
             if avg_cx < left_boundary+80:
                 print("Girar a la izquierda")
                 fw.turn(180)
+                bw.speed = 40
 
             elif avg_cx > right_boundary-80:
                 print("Girar a la derecha")
                 fw.turn(0)
+                bw.speed = 40
             else:
                 print("Adelante")
                 fw.turn(90)
+                bw.speed = 60
 
         else:
             print("No se detecta área negra")
