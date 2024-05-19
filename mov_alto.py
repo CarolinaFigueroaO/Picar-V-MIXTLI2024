@@ -1,9 +1,7 @@
 import cv2
 import numpy as np
 import time
-from picar import back_wheels, front_wheels
 import picar
-
 
 cap = cv2.VideoCapture(0)
 
@@ -136,9 +134,7 @@ def angleAdjustment(lines, frame):
 
 
 def main():
-    picar.setup()
-    bw = back_wheels.Back_Wheels()
-    fw = front_wheels.Front_Wheels()
+
     bw.speed = 50
     createTrackbars()
     while True:
@@ -156,4 +152,7 @@ def main():
         
 
 if __name__ == "__main__":
+    picar.setup()
+    bw = back_wheels.Back_Wheels()
+    fw = front_wheels.Front_Wheels()
     main()
