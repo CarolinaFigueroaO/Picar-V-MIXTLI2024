@@ -2,10 +2,12 @@ import cv2
 import numpy as np
 from picar import back_wheels, front_wheels
 import picar
+import time
+
 
 threshold1 = 240
 threshold2 = 255
-alphaPos = 30
+alphaPos = 80
 betaPos = 48
 
 
@@ -29,6 +31,61 @@ def brightnessAjustment(img):
     return imgBrightness    
 
 
+def blueDetection(frame):
+    imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    lower = np.array([90, 50, 70])
+    upper = np.array([140, 255, 255])
+    mask = cv2.inRange(imgHSV, lower, upper)
+    return mask
+
+def evitBlue(mask):
+    # Encuentra contornos en la máscara
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    if contours:
+        # Encuentra el contorno más grande por área
+        largest_contour = max(contours, key=cv2.contourArea)
+        
+        # Calcula el momento del contorno
+        M = cv2.moments(largest_contour)
+        
+        if M["m00"] != 0:
+            # Calcula la coordenada del centro del contorno en X
+            cX = int(M["m10"] / M["m00"])
+            width = mask.shape[1]
+
+            # Decide la dirección del movimiento basado en la posición X
+            if cX < width // 20:
+                direction = "Adelante"
+            elif cX > 9.5 * width // 10:
+                direction = "Adelante"
+            elif cX < width // 3:
+                direction = "Girar a la derecha"
+                fw.turn(0)
+            elif cX > 2 * width // 3:
+                direction = "Girar a la izquierda"
+                fw.turn(180)
+            else:
+                direction = "Movimiento brusco"
+                bigMovement()
+            
+            print(f"Centro del contorno azul en X: {cX}, {direction}")
+        else:
+            print("No se pudo calcular el centro del contorno")
+
+
+def bigMovement():
+    now = time.time()
+    while time.time() - now < 1:
+        bw.speed = 80
+        fw.turn(0)
+    now = time.time()
+    while time.time() - now < 1:
+        bw.speed = 60
+        fw.turn(180)
+    
+
+
 def getLines(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 200])
@@ -43,72 +100,61 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
-def analyzeFrame(frame):
-    mask = getArea(frame)
-    
-    # Encuentra contornos en la máscara
+def evitLines(mask):
+        # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     if contours:
-        # Calcula el centroide promedio de los contornos
-        cx_total = 0
-        cy_total = 0
-        total_area = 0
+        # Encuentra el contorno más grande por área
+        largest_contour = max(contours, key=cv2.contourArea)
         
-        for contour in contours:
-            M = cv2.moments(contour)
-            if M["m00"] != 0:
-                cx = int(M["m10"] / M["m00"])
-                cy = int(M["m01"] / M["m00"])
-                area = cv2.contourArea(contour)
-                
-                cx_total += cx * area
-                cy_total += cy * area
-                total_area += area
+        # Calcula el momento del contorno
+        M = cv2.moments(largest_contour)
         
-        if total_area != 0:
-            avg_cx = cx_total / total_area
-            avg_cy = cy_total / total_area
-            
-            # Divide la imagen en tres partes: izquierda, centro y derecha
-            height, width = frame.shape[:2]
-            left_boundary = width / 3
-            right_boundary = 2 * width / 3
-            
-            if avg_cx < left_boundary+80:
-                print("Girar a la izquierda")
+        if M["m00"] != 0:
+            # Calcula la coordenada del centro del contorno en X
+            cX = int(M["m10"] / M["m00"])
+            width = mask.shape[1]
+
+            # Decide la dirección del movimiento basado en la posición X
+            if cX > 2 * width // 6 and cX < width // 2:
+                direction = "Girar a la derecha"
+                fw.turn(0)
+            elif cX > width // 2 and cX < 5 * width // 6:
+                direction = "Girar a la izquierda"
                 fw.turn(180)
 
-            elif avg_cx > right_boundary-80:
-                print("Girar a la derecha")
-                fw.turn(0)
             else:
-                print("Adelante")
+                direction = "Adelante"
                 fw.turn(80)
-
+            
+            print(f"Centro de linea en X: {cX}, {direction}")
         else:
-            print("No se detecta área negra")
+            print("No se pudo calcular el centro del contorno")
     else:
-        print("No se detecta área negra")
-
-    return mask
+        print("No se detectaron lineas")
 
 
 def main():
-    bw.speed = 40
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
+    bw.speed = 20
     createTrackbars()
     while True:
         ret, frame = cap.read()
         if not ret:
             break
         frame = brightnessAjustment(frame)
-        mask = analyzeFrame(frame)
-        
+        blue = blueDetection(frame)
+        lines = getLines(frame)
+        if lines is not None:
+            evitLines(lines)
+        if blue is not None:
+            evitBlue(blue)
         # Muestra el frame y la máscara para depuración
         cv2.imshow("Frame", frame)
-        cv2.imshow("Mask", mask)
+        cv2.imshow("Blue", blue)
+        cv2.imshow("Lines", lines)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -118,10 +164,8 @@ def main():
     bw.speed = 0
     bw.stop()
 
-
 if __name__ == "__main__":
     picar.setup()
     bw = back_wheels.Back_Wheels()
     fw = front_wheels.Front_Wheels()
     main()
-
