@@ -120,10 +120,10 @@ def evitLines(mask):
                 width = mask.shape[1]
 
                 # Decide la dirección del movimiento basado en la posición X
-                if cX  < width // 3 and cX > width // 4:
+                if cX < width // 2 and cX > width // 4:
                     direction = "Girar a la derecha"
                     fw.turn(180)
-                elif cX > 2 * width // 3 and cX < 3 * width // 4:
+                elif cX > width // 2 and cX < 3 * width // 4:
                     direction = "Girar a la izquierda"
                     fw.turn(0)
 
