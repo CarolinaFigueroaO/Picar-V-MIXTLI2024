@@ -8,7 +8,7 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
-min_area = 10
+min_area = 100
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -104,9 +104,9 @@ def evitLines(mask):
                 width = mask.shape[1]
 
                 # Decide la dirección del movimiento basado en la posición X
-                if cX > width // 8:
+                if cX < width // 3 and cX > width // 6:
                     direction = "Girar a la derecha"
-                elif cX > 7 * width // 8:
+                elif cX > 2 * width // 3 and cX < 5 * width // 6:
                     direction = "Girar a la izquierda"
 
                 else:
