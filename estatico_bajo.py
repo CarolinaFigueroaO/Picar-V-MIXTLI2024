@@ -9,7 +9,7 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
-min_area = 100
+min_area = 80
 
 def empty(a): # Funcion para los trackbars
     pass
