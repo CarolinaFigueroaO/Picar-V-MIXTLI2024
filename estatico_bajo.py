@@ -9,6 +9,7 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
+min_area = 100
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -47,27 +48,27 @@ def evitBlue(mask):
         
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
-        
-        if M["m00"] != 0:
-            # Calcula la coordenada del centro del contorno en X
-            cX = int(M["m10"] / M["m00"])
-            width = mask.shape[1]
+        if area >= min_area:
+            if M["m00"] != 0:
+                # Calcula la coordenada del centro del contorno en X
+                cX = int(M["m10"] / M["m00"])
+                width = mask.shape[1]
 
-            # Decide la dirección del movimiento basado en la posición X
-            if cX < width // 20:
-                direction = "Adelante"
-            elif cX > 9.5 * width // 10:
-                direction = "Adelante"
-            elif cX < width // 3:
-                direction = "Girar a la derecha"
-            elif cX > 2 * width // 3:
-                direction = "Girar a la izquierda"
+                # Decide la dirección del movimiento basado en la posición X
+                if cX < width // 20:
+                    direction = "Adelante"
+                elif cX > 9.5 * width // 10:
+                    direction = "Adelante"
+                elif cX < width // 3:
+                    direction = "Girar a la derecha"
+                elif cX > 2 * width // 3:
+                    direction = "Girar a la izquierda"
+                else:
+                    direction = "Movimiento brusco"
+                
+                print(f"Centro del contorno azul en X: {cX}, {direction}")
             else:
-                direction = "Movimiento brusco"
-            
-            print(f"Centro del contorno azul en X: {cX}, {direction}")
-        else:
-            print("No se pudo calcular el centro del contorno")
+                print("No se pudo calcular el centro del contorno")
 
 
     
