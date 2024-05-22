@@ -140,7 +140,7 @@ def evitLines(mask):
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
-    bw.speed = 20
+    bw.speed = 10
     createTrackbars()
     while True:
         ret, frame = cap.read()
@@ -151,8 +151,8 @@ def main():
         lines = getLines(frame)
         if lines is not None:
             evitLines(lines)
-        if blue is not None:
-            evitBlue(blue)
+        #if blue is not None:
+        #    evitBlue(blue)
         # Muestra el frame y la máscara para depuración
         cv2.imshow("Frame", frame)
         cv2.imshow("Blue", blue)
