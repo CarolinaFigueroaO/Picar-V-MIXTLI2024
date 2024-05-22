@@ -61,14 +61,16 @@ def evitBlue(mask):
             # Decide la dirección del movimiento basado en la posición X
             if cX < width // 20:
                 direction = "Adelante"
+                fw.turn(90)
             elif cX > 9.5 * width // 10:
                 direction = "Adelante"
+                fw.turn(90)
             elif cX < width // 3:
                 direction = "Girar a la derecha"
-                fw.turn(0)
+                fw.turn(180)
             elif cX > 2 * width // 3:
                 direction = "Girar a la izquierda"
-                fw.turn(180)
+                fw.turn(0)
             else:
                 direction = "Movimiento brusco"
                 bigMovement()
@@ -82,11 +84,11 @@ def bigMovement():
     now = time.time()
     while time.time() - now < 1:
         bw.speed = 80
-        fw.turn(0)
+        fw.turn(180)
     now = time.time()
     while time.time() - now < 1:
         bw.speed = 60
-        fw.turn(180)
+        fw.turn(0)
     
 
 
@@ -186,8 +188,8 @@ def main():
         lines = getLines(frame)
         if lines is not None:
             evitLines(lines)
-        #if blue is not None:
-        #    evitBlue(blue)
+        if blue is not None:
+            evitBlue(blue)
         # Muestra el frame y la máscara para depuración
         cv2.imshow("Frame", frame)
         cv2.imshow("Blue", blue)
