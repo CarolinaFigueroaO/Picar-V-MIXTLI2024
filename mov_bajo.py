@@ -175,7 +175,7 @@ def evitLines(mask):
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
-    bw.speed = 30
+    bw.speed = 40
     createTrackbars()
     while True:
         ret, frame = cap.read()
