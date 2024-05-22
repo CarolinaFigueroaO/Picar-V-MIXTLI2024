@@ -10,6 +10,9 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
+min_area = 10
+
+
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -103,37 +106,36 @@ def getArea(frame):
 def evitLines(mask):
         # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     if contours:
         # Encuentra el contorno más grande por área
         largest_contour = max(contours, key=cv2.contourArea)
-        
+        area = cv2.contourArea(largest_contour)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
-        
-        if M["m00"] != 0:
-            # Calcula la coordenada del centro del contorno en X
-            cX = int(M["m10"] / M["m00"])
-            width = mask.shape[1]
+        if area >= min_area:
+            if M["m00"] != 0:
+                # Calcula la coordenada del centro del contorno en X
+                cX = int(M["m10"] / M["m00"])
+                width = mask.shape[1]
 
-            # Decide la dirección del movimiento basado en la posición X
-            if cX > 2 * width // 6 and cX < width // 2:
-                direction = "Girar a la derecha"
-                fw.turn(0)
-            elif cX > width // 2 and cX < 5 * width // 6:
-                direction = "Girar a la izquierda"
-                fw.turn(180)
+                # Decide la dirección del movimiento basado en la posición X
+                if cX > width // 8:
+                    direction = "Girar a la derecha"
+                    fw.turn(0)
+                elif cX > 7 * width // 8:
+                    direction = "Girar a la izquierda"
+                    fw.turn(180)
 
+                else:
+                    direction = "Adelante"
+                    fw.turn(90)
+                
+                print(f"Centro de linea en X: {cX}, {direction}")
             else:
-                direction = "Adelante"
-                fw.turn(80)
-            
-            print(f"Centro de linea en X: {cX}, {direction}")
-        else:
-            print("No se pudo calcular el centro del contorno")
+                print("No se pudo calcular el centro del contorno")
     else:
         print("No se detectaron lineas")
-
 
 def main():
     # Suponiendo que estás capturando video desde una cámara

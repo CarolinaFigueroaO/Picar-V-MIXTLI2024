@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import picar
 import time
 
 
@@ -9,7 +8,7 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
-min_area = 80
+min_area = 10
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -91,31 +90,31 @@ def getArea(frame):
 def evitLines(mask):
         # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
+
     if contours:
         # Encuentra el contorno más grande por área
         largest_contour = max(contours, key=cv2.contourArea)
-        
+        area = cv2.contourArea(largest_contour)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
-        
-        if M["m00"] != 0:
-            # Calcula la coordenada del centro del contorno en X
-            cX = int(M["m10"] / M["m00"])
-            width = mask.shape[1]
+        if area >= min_area:
+            if M["m00"] != 0:
+                # Calcula la coordenada del centro del contorno en X
+                cX = int(M["m10"] / M["m00"])
+                width = mask.shape[1]
 
-            # Decide la dirección del movimiento basado en la posición X
-            if cX > width // 3:
-                direction = "Girar a la derecha"
-            elif cX > 2 * width // 3:
-                direction = "Girar a la izquierda"
+                # Decide la dirección del movimiento basado en la posición X
+                if cX > width // 8:
+                    direction = "Girar a la derecha"
+                elif cX > 7 * width // 8:
+                    direction = "Girar a la izquierda"
 
+                else:
+                    direction = "Adelante"
+                
+                print(f"Centro de linea en X: {cX}, {direction}")
             else:
-                direction = "Adelante"
-            
-            print(f"Centro de linea en X: {cX}, {direction}")
-        else:
-            print("No se pudo calcular el centro del contorno")
+                print("No se pudo calcular el centro del contorno")
     else:
         print("No se detectaron lineas")
 
@@ -129,15 +128,15 @@ def main():
         if not ret:
             break
         frame = brightnessAjustment(frame)
-        blue = blueDetection(frame)
+        #blue = blueDetection(frame)
         lines = getLines(frame)
         if lines is not None:
             evitLines(lines)
-        if blue is not None:
-            evitBlue(blue)
+        #if blue is not None:
+        #    evitBlue(blue)
         # Muestra el frame y la máscara para depuración
         cv2.imshow("Frame", frame)
-        cv2.imshow("Blue", blue)
+        #cv2.imshow("Blue", blue)
         cv2.imshow("Lines", lines)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
