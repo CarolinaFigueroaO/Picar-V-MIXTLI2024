@@ -114,7 +114,7 @@ def evitLines(mask):
                 
                 print(f"Centro de linea en X: {cX}, {direction}")
             else:
-                print("No se pudo calcular el centro del contorno")
+                print("No se pudo calcular el centro de las lineas")
     else:
         print("No se detectaron lineas")
 
@@ -128,15 +128,15 @@ def main():
         if not ret:
             break
         frame = brightnessAjustment(frame)
-        #blue = blueDetection(frame)
+        blue = blueDetection(frame)
         lines = getLines(frame)
         if lines is not None:
             evitLines(lines)
-        #if blue is not None:
-        #    evitBlue(blue)
+        if blue is not None:
+            evitBlue(blue)
         # Muestra el frame y la máscara para depuración
         cv2.imshow("Frame", frame)
-        #cv2.imshow("Blue", blue)
+        cv2.imshow("Blue", blue)
         cv2.imshow("Lines", lines)
         
         if cv2.waitKey(1) & 0xFF == ord('q'):
