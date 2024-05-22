@@ -17,8 +17,8 @@ bw.speed = 50
 count = 0
 
 while count < 100:
-    fw.turn(180)
-    count += 0.00005
+    fw.turn(90)
+    count += 0.0005
 
     
 
