@@ -10,7 +10,8 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
-min_area = 10
+min_area = 1000
+max_area = 80000
 
 
 
@@ -103,6 +104,37 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
+def closeCurve(contours):
+    print("Close curve")
+    # Initialize a list to store the angles of the contours
+    if len(contours) > 0:
+        x, y, w, h = cv2.boundingRect(contours[0]) # Get the rectangle that encloses the contour
+        box = cv2.minAreaRect(contours[0]) 
+        (x_min, y_min), (w_min, h_min), angle = box # Get the width, height and angle of the rectangle
+        if angle < -45: 
+            angle = 90 + angle
+        if w_min < h_min and angle > 0:
+            angle = (90 - angle) * -1
+        if w_min > h_min and angle < 0:
+            angle = 90 + angle
+        if angle < 0:
+            turn = 90 + angle
+            turn = int(turn)
+            if turn < 10:    # If the turn is less than 10 we consider it centered
+                print("Centered")
+            else:
+                print("Turn right",  turn) # If the turn is greater than 10 we consider it a turn to the right
+                
+                return
+        if angle > 0:
+            turn = 90 - angle
+            turn = int(turn)
+            if turn < 10:   # If the turn is less than 10 we consider it centered
+                print("Centered")
+            else: # If the turn is greater than 10 we consider it a turn to the left
+                print("Turn left", turn) 
+                return
+
 def evitLines(mask):
         # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -114,6 +146,8 @@ def evitLines(mask):
         print("AREA:" , area)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
+        if(area > max_area):
+            closeCurve(contours)
         if area >= min_area:
             if M["m00"] != 0:
                 # Calcula la coordenada del centro del contorno en X
