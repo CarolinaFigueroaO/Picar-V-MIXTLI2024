@@ -49,33 +49,33 @@ def evitBlue(mask):
     if contours:
         # Encuentra el contorno más grande por área
         largest_contour = max(contours, key=cv2.contourArea)
-        
+        area = cv2.contourArea(largest_contour)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
-        
-        if M["m00"] != 0:
-            # Calcula la coordenada del centro del contorno en X
-            cX = int(M["m10"] / M["m00"])
-            width = mask.shape[1]
+        if area >= min_area:
+            if M["m00"] != 0:
+                # Calcula la coordenada del centro del contorno en X
+                cX = int(M["m10"] / M["m00"])
+                width = mask.shape[1]
 
-            # Decide la dirección del movimiento basado en la posición X
-            if cX < width // 20:
-                direction = "Adelante"
-                fw.turn(90)
-            elif cX > 9.5 * width // 10:
-                direction = "Adelante"
-                fw.turn(90)
-            elif cX < width // 3:
-                direction = "Girar a la derecha"
-                fw.turn(180)
-            elif cX > 2 * width // 3:
-                direction = "Girar a la izquierda"
-                fw.turn(0)
-            else:
-                direction = "Movimiento brusco"
-                bigMovement()
-            
-            print(f"Centro del contorno azul en X: {cX}, {direction}")
+                # Decide la dirección del movimiento basado en la posición X
+                if cX < width // 20:
+                    direction = "Adelante"
+                    fw.turn(90)
+                elif cX > 9.5 * width // 10:
+                    direction = "Adelante"
+                    fw.turn(90)
+                elif cX < width // 3:
+                    direction = "Girar a la derecha"
+                    fw.turn(180)
+                elif cX > 2 * width // 3:
+                    direction = "Girar a la izquierda"
+                    fw.turn(0)
+                else:
+                    direction = "Movimiento brusco"
+                    bigMovement()
+                
+                print(f"Centro del contorno azul en X: {cX}, {direction}")
         else:
             print("No se pudo calcular el centro del contorno")
 
