@@ -170,4 +170,5 @@ if __name__ == "__main__":
     picar.setup()
     bw = back_wheels.Back_Wheels()
     fw = front_wheels.Front_Wheels()
+    fw.turn(90)
     main()
