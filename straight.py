@@ -13,12 +13,12 @@ fw.offset = 10
 bw.speed = 0
 bw.backward()
 bw.speed = 30
-fw.turn(0)
 
 count = 0
 
 while count < 100:
-    count += 0.005
+    fw.turn(0)
+    count += 0.00005
 
     
 
