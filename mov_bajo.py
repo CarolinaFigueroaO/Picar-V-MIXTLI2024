@@ -111,6 +111,7 @@ def evitLines(mask):
         # Encuentra el contorno más grande por área
         largest_contour = max(contours, key=cv2.contourArea)
         area = cv2.contourArea(largest_contour)
+        print("AREA:" , area)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
         if area >= min_area:
