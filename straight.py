@@ -12,7 +12,8 @@ fw.offset = 10
 
 bw.speed = 0
 bw.backward()
-bw.speed = 80
+bw.speed = 30
+fw.turn(0)
 
 count = 0
 
