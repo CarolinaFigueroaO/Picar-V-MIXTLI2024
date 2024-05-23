@@ -7,13 +7,13 @@ import time
 
 threshold1 = 240
 threshold2 = 255
-alphaPos = 80
+alphaPos = 60
 betaPos = 48
 
 min_area = 3000
 max_area = 80000
 
-
+velocity = 40
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -174,7 +174,7 @@ def evitLines(mask):
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
-    bw.speed = 40
+    bw.speed = velocity
     createTrackbars()
     while True:
         ret, frame = cap.read()
