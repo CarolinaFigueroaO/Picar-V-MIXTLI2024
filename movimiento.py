@@ -89,13 +89,9 @@ def evitBlue(mask):
 
 
 def incrementObstacles():
-    global last
-    global now
+
     now = time.time()
-    if (now - last) >= 3:
-        global obstacles
-        obstacles += 1
-        last = time.time()
+    
 
 
 def bigMovement():
