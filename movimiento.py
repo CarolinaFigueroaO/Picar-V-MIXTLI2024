@@ -12,6 +12,7 @@ velocity = 90
 #-----------------------
 
 
+global state, obstacles
 
 threshold1 = 240
 threshold2 = 255
