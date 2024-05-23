@@ -86,7 +86,7 @@ def bigMovement():
     while time.time() - now < 1.5:
         fw.turn(180)
     now = time.time()
-    while time.time() - now < 1.5:
+    while time.time() - now < 1:
         fw.turn(0)
     
 
