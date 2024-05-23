@@ -118,6 +118,11 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
+def pause():
+    now = time.time()
+    while time.time() - now < 2:
+        pass
+    return
 
 def evitLines(mask):
         # Encuentra contornos en la máscara
@@ -157,7 +162,7 @@ def evitLines(mask):
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
-    bw.speed = velocity
+    pause()
     createTrackbars()
     while True:
         ret, frame = cap.read()
