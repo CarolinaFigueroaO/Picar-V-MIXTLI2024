@@ -54,7 +54,7 @@ def evitBlue(mask):
         M = cv2.moments(largest_contour)
         if area >= min_area:
             if M["m00"] != 0:
-                bw.speed(30)
+                bw.speed = 30
                 # Calcula la coordenada del centro del contorno en X
                 cX = int(M["m10"] / M["m00"])
                 width = mask.shape[1]
