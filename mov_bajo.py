@@ -7,7 +7,7 @@ import time
 
 threshold1 = 240
 threshold2 = 255
-alphaPos = 60
+alphaPos = 80
 betaPos = 48
 
 min_area = 3000

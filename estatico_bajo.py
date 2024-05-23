@@ -12,8 +12,9 @@ subwindow_width = 320
 subwindow_height = 240
 
 velocity = 40
-global state 
+global state, obstacles
 state = "Detenido"
+obstacles = 0
 
 
 def empty(a): # Funcion para los trackbars
@@ -43,6 +44,7 @@ def blueDetection(frame):
     return mask
 
 def evitBlue(mask):
+    global movement
     # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -69,6 +71,7 @@ def evitBlue(mask):
                     movement = "Girar a la izquierda"
                 else:
                     movement = "Movimiento brusco"
+                    incrementObstacles()
                 
                 print(f"Centro del contorno azul en X: {cX}, {movement}")
             else:
@@ -89,7 +92,13 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
+def incrementObstacles():
+    global obstacles
+    obstacles += 1
+
+
 def evitLines(mask):
+    global movement
         # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -132,6 +141,12 @@ def displayInterface(frame, blue, lines):
     state_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
     cv2.putText(state_img, state, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
+    movement_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
+    cv2.putText(movement_img, movement, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+    obstacles_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
+    cv2.putText(obstacles_img, str(obstacles), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
     frame = cv2.resize(frame, (subwindow_width, subwindow_height))
     blue = cv2.resize(blue, (subwindow_width, subwindow_height))
     lines = cv2.resize(lines, (subwindow_width, subwindow_height))
@@ -145,12 +160,14 @@ def displayInterface(frame, blue, lines):
 
 
     videos1 = np.hstack((frame, blue, lines))
-    videos2 = np.hstack((velocity_img, velocity_img, state_img))
+    videos2 = np.hstack((velocity_img, movement_img, obstacles_img))
     videos = np.vstack((videos1, videos2))
 
     cv2.imshow("Parameters", videos)
 
 def main():
+    global state
+    state = "Avanzando"
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
@@ -177,5 +194,4 @@ def main():
 
 
 if __name__ == "__main__":
-    state = "Avanzando"
     main()
