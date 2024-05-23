@@ -13,7 +13,7 @@ betaPos = 48
 min_area = 3000
 max_area = 80000
 
-velocity = 50
+velocity = 70
 
 def empty(a): # Funcion para los trackbars
     pass
