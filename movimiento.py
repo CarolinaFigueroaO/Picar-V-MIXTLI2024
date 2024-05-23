@@ -163,8 +163,8 @@ def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     pause()
-    bw.speed = velocity
     createTrackbars()
+    bw.speed = velocity
     while True:
         ret, frame = cap.read()
         if not ret:
