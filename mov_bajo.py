@@ -83,10 +83,10 @@ def evitBlue(mask):
 
 def bigMovement():
     now = time.time()
-    while time.time() - now < 1:
+    while time.time() - now < 1.5:
         fw.turn(180)
     now = time.time()
-    while time.time() - now < 1:
+    while time.time() - now < 1.5:
         fw.turn(0)
     
 
