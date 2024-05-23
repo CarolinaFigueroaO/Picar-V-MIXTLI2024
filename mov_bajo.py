@@ -54,7 +54,7 @@ def evitBlue(mask):
         M = cv2.moments(largest_contour)
         if area >= min_area:
             if M["m00"] != 0:
-                bw.speed = 30
+                bw.speed = 50
                 # Calcula la coordenada del centro del contorno en X
                 cX = int(M["m10"] / M["m00"])
                 width = mask.shape[1]
@@ -83,10 +83,10 @@ def evitBlue(mask):
 
 def bigMovement():
     now = time.time()
-    while time.time() - now < 1:
+    while time.time() - now < 2:
         fw.turn(180)
     now = time.time()
-    while time.time() - now < 1:
+    while time.time() - now < 2:
         fw.turn(0)
     
 
@@ -187,6 +187,8 @@ def main():
             evitLines(lines)
         if blue is not None:
             evitBlue(blue)
+        else:
+            bw.speed = velocity
         # Muestra el frame y la máscara para depuración
         cv2.imshow("Frame", frame)
         cv2.imshow("Blue", blue)
