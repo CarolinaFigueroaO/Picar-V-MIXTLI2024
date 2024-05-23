@@ -5,10 +5,10 @@ import picar
 import time
 
 #----------------------
-alphaPos = 80
+alphaPos = 60
 betaPos = 48
 
-velocity = 70
+velocity = 90
 #-----------------------
 
 
