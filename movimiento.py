@@ -4,16 +4,21 @@ from picar import back_wheels, front_wheels
 import picar
 import time
 
+#----------------------
+alphaPos = 80
+betaPos = 48
+
+velocity = 70
+#-----------------------
+
+
 
 threshold1 = 240
 threshold2 = 255
-alphaPos = 80
-betaPos = 48
 
 min_area = 3000
 max_area = 80000
 
-velocity = 70
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -55,6 +60,7 @@ def evitBlue(mask):
         if area >= min_area:
             if M["m00"] != 0:
                 bw.speed = 50
+                incrementObstacles()
                 # Calcula la coordenada del centro del contorno en X
                 cX = int(M["m10"] / M["m00"])
                 width = mask.shape[1]
@@ -81,6 +87,16 @@ def evitBlue(mask):
             print("No se pudo calcular el centro del contorno")
 
 
+def incrementObstacles():
+    global last
+    global now
+    now = time.time()
+    if (now - last) >= 3:
+        global obstacles
+        obstacles += 1
+        last = time.time()
+
+
 def bigMovement():
     now = time.time()
     while time.time() - now < 1.5:
@@ -105,36 +121,6 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
-def closeCurve(contours):
-    print("Close curve")
-    # Initialize a list to store the angles of the contours
-    if len(contours) > 0:
-        x, y, w, h = cv2.boundingRect(contours[0]) # Get the rectangle that encloses the contour
-        box = cv2.minAreaRect(contours[0]) 
-        (x_min, y_min), (w_min, h_min), angle = box # Get the width, height and angle of the rectangle
-        if angle < -45: 
-            angle = 90 + angle
-        if w_min < h_min and angle > 0:
-            angle = (90 - angle) * -1
-        if w_min > h_min and angle < 0:
-            angle = 90 + angle
-        if angle < 0:
-            turn = 90 + angle
-            turn = int(turn)
-            if turn < 10:    # If the turn is less than 10 we consider it centered
-                print("Centered")
-            else:
-                print("Turn right",  turn) # If the turn is greater than 10 we consider it a turn to the right
-                
-                return
-        if angle > 0:
-            turn = 90 - angle
-            turn = int(turn)
-            if turn < 10:   # If the turn is less than 10 we consider it centered
-                print("Centered")
-            else: # If the turn is greater than 10 we consider it a turn to the left
-                print("Turn left", turn) 
-                return
 
 def evitLines(mask):
         # Encuentra contornos en la máscara
@@ -203,6 +189,7 @@ def main():
     bw.stop()
 
 if __name__ == "__main__":
+    last = time.time()
     picar.setup()
     bw = back_wheels.Back_Wheels()
     fw = front_wheels.Front_Wheels()

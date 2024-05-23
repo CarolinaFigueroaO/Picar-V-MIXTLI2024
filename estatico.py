@@ -93,8 +93,13 @@ def getArea(frame):
     return mask
 
 def incrementObstacles():
-    global obstacles
-    obstacles += 1
+    global last
+    global now
+    now = time.time()
+    if (now - last) >= 3:
+        global obstacles
+        obstacles += 1
+        last = time.time()
 
 
 def evitLines(mask):
@@ -194,4 +199,5 @@ def main():
 
 
 if __name__ == "__main__":
+    last = time.time()
     main()
