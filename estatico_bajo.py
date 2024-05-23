@@ -2,17 +2,22 @@ import cv2
 import numpy as np
 import time
 
-
-threshold1 = 240
-threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
 min_area = 100
 
+
+subwindow_width = 320
+subwindow_height = 240
+
+velocity = 40
+global state 
+state = "Detenido"
+
+
 def empty(a): # Funcion para los trackbars
     pass
-
 
 def createTrackbars():
     cv2.namedWindow("Parameters") # Create a window for the trackbars
@@ -55,22 +60,19 @@ def evitBlue(mask):
 
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 20:
-                    direction = "Adelante"
+                    movement = "Adelante"
                 elif cX > 9.5 * width // 10:
-                    direction = "Adelante"
+                    movement = "Adelante"
                 elif cX < width // 3:
-                    direction = "Girar a la derecha"
+                    movement = "Girar a la derecha"
                 elif cX > 2 * width // 3:
-                    direction = "Girar a la izquierda"
+                    movement = "Girar a la izquierda"
                 else:
-                    direction = "Movimiento brusco"
+                    movement = "Movimiento brusco"
                 
-                print(f"Centro del contorno azul en X: {cX}, {direction}")
+                print(f"Centro del contorno azul en X: {cX}, {movement}")
             else:
                 print("No se pudo calcular el centro del contorno")
-
-
-    
 
 
 def getLines(frame):
@@ -105,19 +107,48 @@ def evitLines(mask):
 
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 3 and cX > width // 6:
-                    direction = "Girar a la derecha"
+                    movement = "Girar a la derecha"
                 elif cX > 2 * width // 3 and cX < 5 * width // 6:
-                    direction = "Girar a la izquierda"
+                    movement = "Girar a la izquierda"
 
                 else:
-                    direction = "Adelante"
+                    movement = "Adelante"
                 
-                print(f"Centro de linea en X: {cX}, {direction}")
+                print(f"Centro de linea en X: {cX}, {movement}")
             else:
                 print("No se pudo calcular el centro de las lineas")
     else:
         print("No se detectaron lineas")
 
+
+def displayInterface(frame, blue, lines):
+    cv2.putText(frame, "ORIGINAL FRAME", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(blue, "BLUE FIGURES", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.putText(lines, "DELIMITER LINES", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+    velocity_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
+    cv2.putText(velocity_img, str(velocity), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+    state_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
+    cv2.putText(state_img, state, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
+    frame = cv2.resize(frame, (subwindow_width, subwindow_height))
+    blue = cv2.resize(blue, (subwindow_width, subwindow_height))
+    lines = cv2.resize(lines, (subwindow_width, subwindow_height))
+
+    if len(frame.shape) == 2:
+        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if len(blue.shape) == 2:
+        blue = cv2.cvtColor(blue, cv2.COLOR_GRAY2BGR)
+    if len(lines.shape) == 2:
+        lines = cv2.cvtColor(lines, cv2.COLOR_GRAY2BGR)
+
+
+    videos1 = np.hstack((frame, blue, lines))
+    videos2 = np.hstack((velocity_img, velocity_img, state_img))
+    videos = np.vstack((videos1, videos2))
+
+    cv2.imshow("Parameters", videos)
 
 def main():
     # Suponiendo que estás capturando video desde una cámara
@@ -134,11 +165,10 @@ def main():
             evitLines(lines)
         if blue is not None:
             evitBlue(blue)
-        # Muestra el frame y la máscara para depuración
-        cv2.imshow("Frame", frame)
-        cv2.imshow("Blue", blue)
-        cv2.imshow("Lines", lines)
+            
         
+        displayInterface(frame, blue, lines)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     
@@ -147,4 +177,5 @@ def main():
 
 
 if __name__ == "__main__":
+    state = "Avanzando"
     main()

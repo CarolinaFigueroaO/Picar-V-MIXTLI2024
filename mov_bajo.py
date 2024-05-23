@@ -10,7 +10,7 @@ threshold2 = 255
 alphaPos = 80
 betaPos = 48
 
-min_area = 1000
+min_area = 3000
 max_area = 80000
 
 
@@ -54,6 +54,7 @@ def evitBlue(mask):
         M = cv2.moments(largest_contour)
         if area >= min_area:
             if M["m00"] != 0:
+                bw.speed(30)
                 # Calcula la coordenada del centro del contorno en X
                 cX = int(M["m10"] / M["m00"])
                 width = mask.shape[1]
@@ -83,11 +84,9 @@ def evitBlue(mask):
 def bigMovement():
     now = time.time()
     while time.time() - now < 1:
-        bw.speed = 80
         fw.turn(180)
     now = time.time()
     while time.time() - now < 1:
-        bw.speed = 60
         fw.turn(0)
     
 
@@ -148,8 +147,6 @@ def evitLines(mask):
         print("AREA:" , area)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
-        if(area > max_area):
-            closeCurve(contours)
         if area >= min_area:
             if M["m00"] != 0:
                 # Calcula la coordenada del centro del contorno en X
