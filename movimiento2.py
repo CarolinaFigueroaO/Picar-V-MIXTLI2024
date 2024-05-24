@@ -156,14 +156,14 @@ def evitLines(mask):
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 2 and cX > width // 4:
                     direction = "Girar a la derecha"
-                    fw.turn(180)
+                    fw.turn(right)
                 elif cX > width // 2 and cX < 3 * width // 4:
                     direction = "Girar a la izquierda"
-                    fw.turn(0)
+                    fw.turn(left)
 
                 else:
                     direction = "Adelante"
-                    fw.turn(90)
+                    fw.turn(forward)
                 
                 print(f"Centro de linea en X: {cX}, {direction}")
             else:
@@ -210,6 +210,7 @@ def main():
     cv2.destroyAllWindows()
     bw.speed = stop
     bw.stop()
+    print("OBSTACULOS ENCONTRADOS:", obstacles)
 
 if __name__ == "__main__":
     last = time.time()
