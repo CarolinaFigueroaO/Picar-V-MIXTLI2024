@@ -27,6 +27,8 @@ left = 0
 forward = 90
 stop = 0
 
+subwidth = 320
+subheight = 240
 
 def empty(a): # Funcion para los trackbars
     pass
@@ -80,15 +82,15 @@ def evitBlue(mask):
                 elif cX > 9.5 * width // 10:
                     direction = "Adelante"
                     fw.turn(forward)
-                elif cX < width // 3:
+                elif cX < width // 2:
                     direction = "Girar a la derecha"
                     fw.turn(right)
-                elif cX > 2 * width // 3:
+                elif cX > width // 2:
                     direction = "Girar a la izquierda"
                     fw.turn(left)
                 else:
-                    direction = "Movimiento brusco"
-                    bigMovement()
+                    direction = "Adelante"
+                    fw.turn(forward)
                 
                 print(f"Centro del contorno azul en X: {cX}, {direction}")
         else:
@@ -173,7 +175,6 @@ def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
-    pause()
     bw.speed = velocity
     while True:
         ret, frame = cap.read()
@@ -182,14 +183,15 @@ def main():
         frame = brightnessAjustment(frame)
         blue = blueDetection(frame)
         lines = getLines(frame)
+        if lines is not None:
+            evitLines(lines)
         if blue is not None:
             evitBlue(blue)
         else:
             bw.speed = velocity
-        if lines is not None:
-            evitLines(lines)
-
-
+        frame = cv2.resize(frame, (subwidth, subheight))
+        blue = cv2.resize(blue, (subwidth, subheight))
+        lines = cv2.resize(lines, (subwidth, subheight))
         if len(frame.shape) == 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         if len(blue.shape) == 2:
@@ -208,6 +210,7 @@ def main():
     cv2.destroyAllWindows()
     bw.speed = stop
     bw.stop()
+    print("OBSTACULOS ENCONTRADOS:", obstacles)
 
 if __name__ == "__main__":
     last = time.time()

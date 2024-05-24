@@ -18,7 +18,7 @@ count = 0
 
 while count < 100:
     fw.turn(90)
-    count += 0.0005
+    count += 0.005
 
     
 
