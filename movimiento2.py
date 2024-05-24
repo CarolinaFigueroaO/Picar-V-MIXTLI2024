@@ -80,15 +80,15 @@ def evitBlue(mask):
                 elif cX > 9.5 * width // 10:
                     direction = "Adelante"
                     fw.turn(forward)
-                elif cX < width // 3:
+                elif cX < width // 2:
                     direction = "Girar a la derecha"
                     fw.turn(right)
-                elif cX > 2 * width // 3:
+                elif cX > width // 2:
                     direction = "Girar a la izquierda"
                     fw.turn(left)
                 else:
-                    direction = "Movimiento brusco"
-                    bigMovement()
+                    direction = "Adelante"
+                    fw.turn(forward)
                 
                 print(f"Centro del contorno azul en X: {cX}, {direction}")
         else:
