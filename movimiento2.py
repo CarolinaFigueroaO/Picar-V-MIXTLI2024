@@ -27,6 +27,8 @@ left = 0
 forward = 90
 stop = 0
 
+subwidth = 320
+subheight = 240
 
 def empty(a): # Funcion para los trackbars
     pass
