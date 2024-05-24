@@ -1,24 +1,37 @@
 import cv2
 import numpy as np
+
 import time
 
-alphaPos = 80
+#----------------------
+alphaPos = 60
 betaPos = 48
 
-min_area = 100
+velocity = 90
+#-----------------------
 
+medium_velocity = 50
 
-subwindow_width = 320
-subwindow_height = 240
-
-velocity = 40
 global state, obstacles
-state = "Detenido"
 obstacles = 0
 
+threshold1 = 240
+threshold2 = 255
+
+min_area = 3000
+max_area = 80000
+
+right = 180
+left = 0
+forward = 90
+stop = 0
+
+subwidth = 320
+subheight = 240
 
 def empty(a): # Funcion para los trackbars
     pass
+
 
 def createTrackbars():
     cv2.namedWindow("Parameters") # Create a window for the trackbars
@@ -44,7 +57,6 @@ def blueDetection(frame):
     return mask
 
 def evitBlue(mask):
-    global movement
     # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -56,26 +68,35 @@ def evitBlue(mask):
         M = cv2.moments(largest_contour)
         if area >= min_area:
             if M["m00"] != 0:
+                incrementObstacles()
                 # Calcula la coordenada del centro del contorno en X
                 cX = int(M["m10"] / M["m00"])
                 width = mask.shape[1]
 
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 20:
-                    movement = "Adelante"
+                    direction = "Adelante"
                 elif cX > 9.5 * width // 10:
-                    movement = "Adelante"
-                elif cX < width // 3:
-                    movement = "Girar a la derecha"
-                elif cX > 2 * width // 3:
-                    movement = "Girar a la izquierda"
+                    direction = "Adelante"
+                elif cX < width // 2:
+                    direction = "Girar a la derecha"
+                elif cX > width // 2:
+                    direction = "Girar a la izquierda"
                 else:
-                    movement = "Movimiento brusco"
-                    incrementObstacles()
+                    direction = "Adelante"
                 
-                print(f"Centro del contorno azul en X: {cX}, {movement}")
-            else:
-                print("No se pudo calcular el centro del contorno")
+                print(f"Centro del contorno azul en X: {cX}, {direction}")
+        else:
+            print("No se pudo calcular el centro del contorno")
+
+def incrementObstacles():
+    global last
+    global now
+    now = time.time()
+    if (now - last) >= 3:
+        global obstacles
+        obstacles += 1
+        last = time.time()
 
 
 def getLines(frame):
@@ -92,18 +113,13 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
-def incrementObstacles():
-    global last
-    global now
+def pause():
     now = time.time()
-    if (now - last) >= 3:
-        global obstacles
-        obstacles += 1
-        last = time.time()
-
+    while time.time() - now < 2:
+        pass
+    return
 
 def evitLines(mask):
-    global movement
         # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -111,6 +127,7 @@ def evitLines(mask):
         # Encuentra el contorno más grande por área
         largest_contour = max(contours, key=cv2.contourArea)
         area = cv2.contourArea(largest_contour)
+        print("AREA:" , area)
         # Calcula el momento del contorno
         M = cv2.moments(largest_contour)
         if area >= min_area:
@@ -120,59 +137,20 @@ def evitLines(mask):
                 width = mask.shape[1]
 
                 # Decide la dirección del movimiento basado en la posición X
-                if cX < width // 3 and cX > width // 6:
-                    movement = "Girar a la derecha"
-                elif cX > 2 * width // 3 and cX < 5 * width // 6:
-                    movement = "Girar a la izquierda"
+                if cX < width // 2 and cX > width // 4:
+                    direction = "Girar a la derecha"
+                elif cX > width // 2 and cX < 3 * width // 4:
+                    direction = "Girar a la izquierda"
 
                 else:
-                    movement = "Adelante"
-                
-                print(f"Centro de linea en X: {cX}, {movement}")
+                    direction = "Adelante"
+                print(f"Centro de linea en X: {cX}, {direction}")
             else:
-                print("No se pudo calcular el centro de las lineas")
+                print("No se pudo calcular el centro del contorno")
     else:
         print("No se detectaron lineas")
 
-
-def displayInterface(frame, blue, lines):
-    cv2.putText(frame, "ORIGINAL FRAME", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(blue, "BLUE FIGURES", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-    cv2.putText(lines, "DELIMITER LINES", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    velocity_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
-    cv2.putText(velocity_img, str(velocity), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    state_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
-    cv2.putText(state_img, state, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    movement_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
-    cv2.putText(movement_img, movement, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    obstacles_img = np.zeros((subwindow_height, subwindow_width, 3), dtype=np.uint8)
-    cv2.putText(obstacles_img, str(obstacles), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
-    frame = cv2.resize(frame, (subwindow_width, subwindow_height))
-    blue = cv2.resize(blue, (subwindow_width, subwindow_height))
-    lines = cv2.resize(lines, (subwindow_width, subwindow_height))
-
-    if len(frame.shape) == 2:
-        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
-    if len(blue.shape) == 2:
-        blue = cv2.cvtColor(blue, cv2.COLOR_GRAY2BGR)
-    if len(lines.shape) == 2:
-        lines = cv2.cvtColor(lines, cv2.COLOR_GRAY2BGR)
-
-
-    videos1 = np.hstack((frame, blue, lines))
-    videos2 = np.hstack((velocity_img, movement_img, obstacles_img))
-    videos = np.vstack((videos1, videos2))
-
-    cv2.imshow("Parameters", videos)
-
 def main():
-    global state
-    state = "Avanzando"
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
@@ -187,10 +165,21 @@ def main():
             evitLines(lines)
         if blue is not None:
             evitBlue(blue)
-            
-        
-        displayInterface(frame, blue, lines)
 
+        frame = cv2.resize(frame, (subwidth, subheight))
+        blue = cv2.resize(blue, (subwidth, subheight))
+        lines = cv2.resize(lines, (subwidth, subheight))
+        if len(frame.shape) == 2:
+            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+        if len(blue.shape) == 2:
+            blue = cv2.cvtColor(blue, cv2.COLOR_GRAY2BGR)
+        if len(lines.shape) == 2:
+            lines = cv2.cvtColor(lines, cv2.COLOR_GRAY2BGR)
+        # Muestra el frame y la máscara para depuración
+        videos = np.hstack((frame, blue, lines))
+        cv2.imshow("Parameters", videos)
+
+        
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     

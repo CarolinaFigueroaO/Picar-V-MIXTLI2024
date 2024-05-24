@@ -173,7 +173,6 @@ def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
-    pause()
     bw.speed = velocity
     while True:
         ret, frame = cap.read()
@@ -188,7 +187,9 @@ def main():
             evitBlue(blue)
         else:
             bw.speed = velocity
-
+        frame = cv2.resize(frame, (subwidth, subheight))
+        blue = cv2.resize(blue, (subwidth, subheight))
+        lines = cv2.resize(lines, (subwidth, subheight))
         if len(frame.shape) == 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         if len(blue.shape) == 2:
