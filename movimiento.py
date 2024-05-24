@@ -182,12 +182,13 @@ def main():
         frame = brightnessAjustment(frame)
         blue = blueDetection(frame)
         lines = getLines(frame)
-        if lines is not None:
-            evitLines(lines)
         if blue is not None:
             evitBlue(blue)
         else:
             bw.speed = velocity
+        if lines is not None:
+            evitLines(lines)
+
 
         if len(frame.shape) == 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
