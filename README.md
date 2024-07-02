@@ -1,4 +1,4 @@
-# Formule Tec in Grand Prix Autonomous Mechatronics - May 2024
+# Tec Formula in Grand Prix Autonomous Mechatronics - May 2024
 
 In this code, I developed an algorithm in Python for the Picar V car kits autonomous driving, with the help of picar library for its motor control.
 
