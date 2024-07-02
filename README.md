@@ -6,21 +6,12 @@ In this code, I developed an algorithm in Python for the Picar V car kits' auton
 - Picar V kit
 - Picar library from the repository: 
     [git@github.com:sunfounder/SunFounder_PiCar-V.git](https://github.com/sunfounder/SunFounder_PiCar-V)
-- Real VNC server and viewer
-
-
-### Installation steps
-1. Assemble your Picar V car.
-2. Perform the basic configuration, such as setting up the username and password.
-3. Clone the SunFounder Picar V repository.
-4. Navigate to the repository directory on your Raspberry Pi.
-5. Enter the following commands in the terminal:
-sudo ./install_dependecies
-picar servo-install
+- OpenCV and numpy python libraries
+- Real VNC server and viewer for the remote control
 
 
 ### Usage
-This algorithm can be used on a circuit where the background is black, and the lane lines are white.
+This algorithm can be used on a circuit with black background, and the two lane lines are white (without midlines).
 
 The static test video code helps adjust the beta, alpha, and other necessary parameters to achieve the clearest line detection.
 
