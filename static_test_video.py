@@ -1,7 +1,13 @@
+'''
+Andrea Carolina Figueroa Orihuela
+Enginnering in Computer Technologies - ITESM
+
+May 2024
+'''
+
 import cv2
 import numpy as np
-from picar import back_wheels, front_wheels
-import picar
+
 import time
 
 #----------------------
@@ -13,7 +19,7 @@ velocity = 90
 
 medium_velocity = 50
 
-global state, obstacles
+global obstacles
 obstacles = 0
 
 threshold1 = 240
@@ -69,7 +75,6 @@ def evitBlue(mask):
         M = cv2.moments(largest_contour)
         if area >= min_area:
             if M["m00"] != 0:
-                bw.speed = medium_velocity
                 incrementObstacles()
                 # Calcula la coordenada del centro del contorno en X
                 cX = int(M["m10"] / M["m00"])
@@ -77,24 +82,19 @@ def evitBlue(mask):
 
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 20:
-                    direction = "Adelante"
-                    fw.turn(forward)
+                    direction = "Turn right"
                 elif cX > 9.5 * width // 10:
-                    direction = "Adelante"
-                    fw.turn(forward)
+                    direction = "Forward"
                 elif cX < width // 2:
-                    direction = "Girar a la derecha"
-                    fw.turn(right)
+                    direction = "Turn right"
                 elif cX > width // 2:
-                    direction = "Girar a la izquierda"
-                    fw.turn(left)
+                    direction = "Turn left"
                 else:
-                    direction = "Adelante"
-                    fw.turn(forward)
+                    direction = "Forward"
                 
-                print(f"Centro del contorno azul en X: {cX}, {direction}")
+                print(f"Center of the obstacle in X: {cX}, {direction}")
         else:
-            print("No se pudo calcular el centro del contorno")
+            print("No obstacle detected")
 
 def incrementObstacles():
     global last
@@ -104,16 +104,6 @@ def incrementObstacles():
         global obstacles
         obstacles += 1
         last = time.time()
-
-
-def bigMovement():
-    now = time.time()
-    while time.time() - now < 1.5:
-        fw.turn(right)
-    now = time.time()
-    while time.time() - now < 1:
-        fw.turn(left)
-    
 
 
 def getLines(frame):
@@ -155,27 +145,22 @@ def evitLines(mask):
 
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 2 and cX > width // 4:
-                    direction = "Girar a la derecha"
-                    fw.turn(right)
+                    direction = "Turn right"
                 elif cX > width // 2 and cX < 3 * width // 4:
-                    direction = "Girar a la izquierda"
-                    fw.turn(left)
+                    direction = "Turn left"
 
                 else:
-                    direction = "Adelante"
-                    fw.turn(forward)
-                
-                print(f"Centro de linea en X: {cX}, {direction}")
+                    direction = "Forward"
+                print(f"Center of the path in X: {cX}, {direction}")
             else:
-                print("No se pudo calcular el centro del contorno")
+                print("Can't detect the center of the path")
     else:
-        print("No se detectaron lineas")
+        print("No lines detected")
 
 def main():
     # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
-    bw.speed = velocity
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -187,8 +172,7 @@ def main():
             evitLines(lines)
         if blue is not None:
             evitBlue(blue)
-        else:
-            bw.speed = velocity
+
         frame = cv2.resize(frame, (subwidth, subheight))
         blue = cv2.resize(blue, (subwidth, subheight))
         lines = cv2.resize(lines, (subwidth, subheight))
@@ -208,14 +192,8 @@ def main():
     
     cap.release()
     cv2.destroyAllWindows()
-    bw.speed = stop
-    bw.stop()
-    print("OBSTACULOS ENCONTRADOS:", obstacles)
+
 
 if __name__ == "__main__":
     last = time.time()
-    picar.setup()
-    bw = back_wheels.Back_Wheels()
-    fw = front_wheels.Front_Wheels()
-    fw.turn(forward)
     main()

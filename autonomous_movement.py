@@ -1,8 +1,18 @@
+'''
+Andrea Carolina Figueroa Orihuela
+Enginnering in Computer Technologies - ITESM
+
+May 2024
+'''
+
+#Import libraries
 import cv2
 import numpy as np
-
+from picar import back_wheels, front_wheels
+import picar
 import time
 
+#Define global variables
 #----------------------
 alphaPos = 60
 betaPos = 48
@@ -12,7 +22,7 @@ velocity = 90
 
 medium_velocity = 50
 
-global state, obstacles
+global obstacles
 obstacles = 0
 
 threshold1 = 240
@@ -29,10 +39,12 @@ stop = 0
 subwidth = 320
 subheight = 240
 
-def empty(a): # Funcion para los trackbars
+
+#Define an empty function
+def empty(a):
     pass
 
-
+#Create trackbars for the brightness adjustment
 def createTrackbars():
     cv2.namedWindow("Parameters") # Create a window for the trackbars
     cv2.resizeWindow("Parameters",640,240) 
@@ -41,14 +53,14 @@ def createTrackbars():
     cv2.setTrackbarPos("Alpha", "Parameters", alphaPos)
     cv2.setTrackbarPos("Beta", "Parameters", betaPos)
 
-
+#Adjust the brightness of the image
 def brightnessAjustment(img):
     alpha = cv2.getTrackbarPos("Alpha", "Parameters") / 100
     beta = cv2.getTrackbarPos("Beta", "Parameters")
     imgBrightness = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
     return imgBrightness    
 
-
+#Detect the blue color (obstacles) in the image
 def blueDetection(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([90, 50, 70])
@@ -56,39 +68,47 @@ def blueDetection(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
-def evitBlue(mask):
-    # Encuentra contornos en la máscara
+#Avoid the blue obstacles
+def avoidBlue(mask):
+    # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     if contours:
-        # Encuentra el contorno más grande por área
+        # Find the largest contour by area
         largest_contour = max(contours, key=cv2.contourArea)
         area = cv2.contourArea(largest_contour)
-        # Calcula el momento del contorno
+        # Calculate the moment of the contour
         M = cv2.moments(largest_contour)
         if area >= min_area:
             if M["m00"] != 0:
+                bw.speed = medium_velocity
                 incrementObstacles()
-                # Calcula la coordenada del centro del contorno en X
+                # Calculate the coordinate of the center of the contour in X
                 cX = int(M["m10"] / M["m00"])
                 width = mask.shape[1]
 
-                # Decide la dirección del movimiento basado en la posición X
+                # Decide the direction of the movement based on the X position
                 if cX < width // 20:
-                    direction = "Adelante"
+                    direction = "Forward"
+                    fw.turn(forward)
                 elif cX > 9.5 * width // 10:
-                    direction = "Adelante"
+                    direction = "Forward"
+                    fw.turn(forward)
                 elif cX < width // 2:
-                    direction = "Girar a la derecha"
+                    direction = "Turn right"
+                    fw.turn(right)
                 elif cX > width // 2:
-                    direction = "Girar a la izquierda"
+                    direction = "Turn left"
+                    fw.turn(left)
                 else:
-                    direction = "Adelante"
+                    direction = "Forward"
+                    fw.turn(forward)
                 
-                print(f"Centro del contorno azul en X: {cX}, {direction}")
+                print(f"Center of the obstacle in X: {cX}, {direction}")
         else:
-            print("No se pudo calcular el centro del contorno")
+            print("No obstacles detected")
 
+#Increment the number of obstacles
 def incrementObstacles():
     global last
     global now
@@ -98,7 +118,16 @@ def incrementObstacles():
         obstacles += 1
         last = time.time()
 
-
+#Avoid the blue obstacles with a big movement
+def bigMovement():
+    now = time.time()
+    while time.time() - now < 1.5:
+        fw.turn(right)
+    now = time.time()
+    while time.time() - now < 1:
+        fw.turn(left)
+    
+#Get the lines of the path from the image
 def getLines(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 200])
@@ -106,6 +135,7 @@ def getLines(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
+#Get the area of the path from the image
 def getArea(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 0, 0])
@@ -113,13 +143,8 @@ def getArea(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
-def pause():
-    now = time.time()
-    while time.time() - now < 2:
-        pass
-    return
-
-def evitLines(mask):
+#Avoid the lines of the path
+def avoidLines(mask):
         # Encuentra contornos en la máscara
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -138,22 +163,28 @@ def evitLines(mask):
 
                 # Decide la dirección del movimiento basado en la posición X
                 if cX < width // 2 and cX > width // 4:
-                    direction = "Girar a la derecha"
+                    direction = "Turn right"
+                    fw.turn(right)
                 elif cX > width // 2 and cX < 3 * width // 4:
-                    direction = "Girar a la izquierda"
+                    direction = "Turn left"
+                    fw.turn(left)
 
                 else:
-                    direction = "Adelante"
-                print(f"Centro de linea en X: {cX}, {direction}")
+                    direction = "Forward"
+                    fw.turn(forward)
+                
+                print(f"Center of the path in X: {cX}, {direction}")
             else:
-                print("No se pudo calcular el centro del contorno")
+                print("No lines detected")
     else:
-        print("No se detectaron lineas")
+        print("No lines detected")
 
 def main():
-    # Suponiendo que estás capturando video desde una cámara
     cap = cv2.VideoCapture(0)
     createTrackbars()
+    bw.speed = velocity
+
+    # Loop principal for the routine
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -162,9 +193,11 @@ def main():
         blue = blueDetection(frame)
         lines = getLines(frame)
         if lines is not None:
-            evitLines(lines)
+            avoidLines(lines)
         if blue is not None:
-            evitBlue(blue)
+            avoidBlue(blue)
+        else:
+            bw.speed = velocity
 
         frame = cv2.resize(frame, (subwidth, subheight))
         blue = cv2.resize(blue, (subwidth, subheight))
@@ -185,8 +218,14 @@ def main():
     
     cap.release()
     cv2.destroyAllWindows()
-
+    bw.speed = stop
+    bw.stop()
+    print("OBSTACLES FOUND: ", obstacles)
 
 if __name__ == "__main__":
     last = time.time()
+    picar.setup()
+    bw = back_wheels.Back_Wheels()
+    fw = front_wheels.Front_Wheels()
+    fw.turn(forward)
     main()
