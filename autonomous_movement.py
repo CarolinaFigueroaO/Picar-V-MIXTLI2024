@@ -17,7 +17,7 @@ import time
 alphaPos = 60
 betaPos = 48
 
-velocity = 90
+velocity = 70
 #-----------------------
 
 medium_velocity = 50
@@ -67,6 +67,15 @@ def blueDetection(frame):
     upper = np.array([140, 255, 255])
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
+
+def finishDetection(frame):
+    imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #orange detection
+    lower = np.array([0, 100, 100])
+    upper = np.array([20, 255, 255])
+    mask = cv2.inRange(imgHSV, lower, upper)
+    return mask
+
 
 #Avoid the blue obstacles
 def avoidBlue(mask):
@@ -192,6 +201,11 @@ def main():
         frame = brightnessAjustment(frame)
         blue = blueDetection(frame)
         lines = getLines(frame)
+        orange = finishDetection(frame)
+        
+        if orange is not None:
+            bw.stop()
+            break
         if lines is not None:
             avoidLines(lines)
         if blue is not None:
