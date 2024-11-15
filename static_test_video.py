@@ -133,14 +133,6 @@ def adjustSpeedBasedOnInclination(angle):
     else:
         print(f"NORMAL SPEED")
 
-def orangeDetection(frame):
-    imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    #orange detection
-    lower = np.array([0, 100, 100])
-    upper = np.array([20, 255, 255])
-    mask = cv2.inRange(imgHSV, lower, upper)
-    has_orange = np.any(mask > 0)
-    return has_orange
 
 def evitLines(mask):
         # Encuentra contornos en la máscara
@@ -203,10 +195,7 @@ def main():
         frame = cv2.resize(frame, (subwidth, subheight))
         blue = cv2.resize(blue, (subwidth, subheight))
         lines = cv2.resize(lines, (subwidth, subheight))
-        orange = orangeDetection(frame)
-        if orange:
-            print("Orange detected")
-            #break
+
         if len(frame.shape) == 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         if len(blue.shape) == 2:
