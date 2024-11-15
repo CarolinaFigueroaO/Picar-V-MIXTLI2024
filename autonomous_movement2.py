@@ -68,6 +68,7 @@ def blueDetection(frame):
     upper = np.array([140, 255, 255])
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
+'''
 
 def orangeDetection(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -78,6 +79,7 @@ def orangeDetection(frame):
     has_orange = np.any(mask > 0)
     
     return has_orange
+'''
 
 def adjustSpeedBasedOnInclination(angle):
 
@@ -226,11 +228,15 @@ def main():
         frame = brightnessAjustment(frame)
         blue = blueDetection(frame)
         lines = getLines(frame)
+
+        '''
+        
         orange = orangeDetection(frame)
         
         if orange:
             bw.stop()
             break
+        '''
         if lines is not None:
             avoidLines(lines)
         if blue is not None:
