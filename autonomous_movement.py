@@ -68,13 +68,15 @@ def blueDetection(frame):
     mask = cv2.inRange(imgHSV, lower, upper)
     return mask
 
-def finishDetection(frame):
+def orangeDetection(frame):
     imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     #orange detection
     lower = np.array([0, 100, 100])
     upper = np.array([20, 255, 255])
     mask = cv2.inRange(imgHSV, lower, upper)
-    return mask
+    has_orange = np.any(mask > 0)
+    
+    return has_orange
 
 
 #Avoid the blue obstacles
@@ -201,9 +203,9 @@ def main():
         frame = brightnessAjustment(frame)
         blue = blueDetection(frame)
         lines = getLines(frame)
-        orange = finishDetection(frame)
+        orange = orangeDetection(frame)
         
-        if orange is not None:
+        if orange:
             bw.stop()
             break
         if lines is not None:
